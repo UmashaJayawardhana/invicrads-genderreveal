@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 
 import { supabase } from "@/lib/supabase";
@@ -15,6 +15,13 @@ import TeamResults from "@/components/TeamResults";
 import GuestWish from "@/components/GuestWish";
 import Ending from "@/components/Ending";
 
+interface PageProps {
+  params: Promise<{
+    id: string;
+    guestName: string;
+  }>;
+}
+
 interface Invitation {
   gr_invitation_id: number;
   event_id: number;
@@ -26,27 +33,74 @@ interface Invitation {
   created_at: string;
 }
 
-export default function Home() {
+export default function InvitationPage({
+  params,
+}: PageProps) {
+  // Next.js 16: params is a Promise
+  const { id, guestName } = use(params);
+
+  const invitationId = Number(id);
+  const urlGuestName = decodeURIComponent(guestName);
+
+  // Controls Opening screen / Full invitation
   const [isOpen, setIsOpen] = useState(false);
 
+  // Current invitation
   const [invitation, setInvitation] =
     useState<Invitation | null>(null);
 
-  const [guests, setGuests] =
-    useState<Invitation[]>([]);
+  // All invitations belonging to this event
+  const [guests, setGuests] = useState<Invitation[]>([]);
 
   const [loading, setLoading] = useState(true);
 
-  // Test invitation
-  const invitationId = 10;
-  const guestName = "Sakura";
+  const [error, setError] = useState("");
+
+  // ==========================================
+  // UPDATE VOTE IMMEDIATELY
+  // ==========================================
+
+  const handleVoteUpdated = (
+    invitationId: number,
+    vote: "boy" | "girl"
+  ) => {
+    // Update current invitation
+    setInvitation((prev) =>
+      prev
+        ? {
+            ...prev,
+            vote,
+          }
+        : prev
+    );
+
+    // Update event guest list immediately
+    setGuests((prev) =>
+      prev.map((guest) =>
+        guest.gr_invitation_id === invitationId
+          ? {
+              ...guest,
+              vote,
+            }
+          : guest
+      )
+    );
+  };
 
   useEffect(() => {
-    async function loadData() {
+    async function loadInvitation() {
+      // Check invitation ID
+      if (!Number.isInteger(invitationId)) {
+        setError("Invalid invitation ID.");
+        setLoading(false);
+        return;
+      }
+
       try {
-        // --------------------------------
-        // Load Sakura invitation
-        // --------------------------------
+        // ==========================================
+        // 1. GET CURRENT INVITATION
+        // ==========================================
+
         const {
           data: invitationData,
           error: invitationError,
@@ -71,24 +125,41 @@ export default function Home() {
             invitationError
           );
 
-          setLoading(false);
-          return;
-        }
-
-        if (!invitationData) {
-          console.error(
-            "Invitation not found."
+          setError(
+            "Something went wrong while loading the invitation."
           );
 
           setLoading(false);
           return;
         }
 
+        // Invitation doesn't exist
+        if (!invitationData) {
+          setError("Invitation Not Found.");
+          setLoading(false);
+          return;
+        }
+
+        // ==========================================
+        // 2. CHECK GUEST NAME
+        // ==========================================
+
+        if (
+          urlGuestName.toLowerCase() !==
+          invitationData.guest_name.toLowerCase()
+        ) {
+          setError("Invitation Not Found.");
+          setLoading(false);
+          return;
+        }
+
+        // Save current invitation
         setInvitation(invitationData);
 
-        // --------------------------------
-        // Load all guests from same event
-        // --------------------------------
+        // ==========================================
+        // 3. GET ALL INVITATIONS FOR SAME EVENT
+        // ==========================================
+
         const {
           data: eventInvitations,
           error: eventError,
@@ -119,50 +190,28 @@ export default function Home() {
           );
         }
 
-        setGuests(
-          eventInvitations ?? []
-        );
+        // Save all event guests
+        setGuests(eventInvitations ?? []);
       } catch (error) {
         console.error(
           "Unexpected error:",
           error
+        );
+
+        setError(
+          "Something went wrong while loading the invitation."
         );
       } finally {
         setLoading(false);
       }
     }
 
-    loadData();
-  }, []);
+    loadInvitation();
+  }, [invitationId, urlGuestName]);
 
-  // --------------------------------
-  // Update vote immediately in UI
-  // --------------------------------
-  const handleVoteUpdated = (
-    updatedInvitationId: number,
-    vote: "boy" | "girl"
-  ) => {
-    setInvitation((prev) =>
-      prev
-        ? {
-            ...prev,
-            vote,
-          }
-        : prev
-    );
-
-    setGuests((prev) =>
-      prev.map((guest) =>
-        guest.gr_invitation_id ===
-        updatedInvitationId
-          ? {
-              ...guest,
-              vote,
-            }
-          : guest
-      )
-    );
-  };
+  // ==========================================
+  // LOADING SCREEN
+  // ==========================================
 
   if (loading) {
     return (
@@ -180,50 +229,75 @@ export default function Home() {
     );
   }
 
-  if (!invitation) {
+  // ==========================================
+  // ERROR SCREEN
+  // ==========================================
+
+  if (error || !invitation) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#fffaf7]">
+      <main className="flex min-h-screen items-center justify-center bg-[#fffaf7] px-6">
         <div className="text-center">
           <div className="mb-4 text-5xl">
             💌
           </div>
 
           <h1 className="font-serif text-3xl text-[#514238]">
-            Invitation Not Found
+            {error || "Invitation Not Found"}
           </h1>
         </div>
       </main>
     );
   }
 
+  // ==========================================
+  // MAIN INVITATION
+  // ==========================================
+
   return (
     <main className="min-h-screen bg-[#fffaf7]">
 
-      <AnimatePresence mode="wait">
+      {/* ======================================
+          OPENING SCREEN
+          ====================================== */}
 
+      <AnimatePresence mode="wait">
         {!isOpen && (
           <Opening
-            guestName={guestName}
-            onOpen={() => setIsOpen(true)}
+            guestName={invitation.guest_name}
+            onOpen={() => {
+              setIsOpen(true);
+            }}
           />
         )}
-
       </AnimatePresence>
+
+      {/* ======================================
+          FULL INVITATION
+          ONLY SHOWN AFTER CLICK
+          ====================================== */}
 
       {isOpen && (
         <>
+          {/* HERO */}
+
           <Hero
             parentOne="Kasun"
             parentTwo="Amaya"
           />
 
+          {/* PARENT / PREGNANCY GALLERY */}
+
           <ParentGallery />
 
+          {/* INVITATION MESSAGE */}
+
           <InvitationMessage
-            guestName={guestName}
+            guestName={invitation.guest_name}
             parentOne="Kasun"
             parentTwo="Amaya"
           />
+
+          {/* EVENT DETAILS */}
 
           <EventDetails
             eventDate="December 20, 2026"
@@ -233,29 +307,31 @@ export default function Home() {
             mapsUrl="https://maps.app.goo.gl/pTQNpdidJatXPLC48"
           />
 
+          {/* VOTE */}
+
           <VoteSection
-            guestName={guestName}
-            invitationId={
-              invitation.gr_invitation_id
-            }
+            guestName={invitation.guest_name}
+            invitationId={invitation.gr_invitation_id}
             currentVote={invitation.vote}
             onVoteUpdated={handleVoteUpdated}
           />
+
+          {/* TEAM RESULTS */}
 
           <TeamResults
             invitations={guests}
           />
 
+          {/* GUEST WISH */}
+
           <GuestWish
-            guestName={guestName}
-            invitationId={
-              invitation.gr_invitation_id
-            }
-            currentWish={
-              invitation.wish_message
-            }
+            guestName={invitation.guest_name}
+            invitationId={invitation.gr_invitation_id}
+            currentWish={invitation.wish_message}
             wishes={guests}
           />
+
+          {/* ENDING */}
 
           <Ending
             parentOne="Kasun"
@@ -263,7 +339,6 @@ export default function Home() {
           />
         </>
       )}
-
     </main>
   );
 }
