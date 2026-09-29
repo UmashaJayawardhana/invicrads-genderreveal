@@ -15,11 +15,11 @@ export default function Ending({
   return (
     <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-[#faf7f3] px-5 py-24">
        {/* Background Image */}
-<div className="absolute inset-y-0 left-[30%] right-[30%]">
+<div className="absolute inset-0 md:left-[30%] md:right-[30%] w-full h-full md:w-auto">
   <img
     src="/images/openingbg.png"
     alt="Gender reveal invitation background"
-    className="h-full w-full object-cover"
+    className="h-full w-full object-cover object-center"
   />
 </div>
       
