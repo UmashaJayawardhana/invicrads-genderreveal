@@ -15,11 +15,11 @@ export default function Opening({
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-[#faf7f3]">
    {/* Background Image */}
-<div className="absolute inset-y-0 left-0 right-0 md:left-[30%] md:right-[30%]">
+<div className="absolute inset-0 md:left-[30%] md:right-[30%] w-full h-full md:w-auto">
   <img
     src="/images/openingbg.png"
     alt="Gender reveal invitation background"
-    className="h-full w-full object-cover"
+    className="h-full w-full object-cover object-center"
   />
 </div>
 
