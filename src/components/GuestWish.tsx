@@ -185,11 +185,11 @@ export default function GuestWish({
   return (
     <section className="relative overflow-hidden bg-[#fffaf7] px-5 py-20 sm:px-8 md:px-12 lg:px-20">
 {/* Background Image */}
-<div className="absolute inset-y-0 left-[10%] right-[10%]">
+<div className="absolute inset-0 md:left-[10%] md:right-[10%] w-full h-full md:w-auto">
   <img
     src="/images/hreobg.png"
     alt="Gender reveal invitation background"
-    className="h-full w-full object-cover"
+    className="h-full w-full object-cover object-center"
   />
 </div>
       {/* ==========================================
