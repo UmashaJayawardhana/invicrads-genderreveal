@@ -20,7 +20,14 @@ export default function InvitationMessage({
       {/* =========================
           SOFT BLUE BACKGROUND
       ========================= */}
-
+{/* Background Image */}
+<div className="absolute inset-y-0 left-[25%] right-[25%]">
+  <img
+    src="/images/invitemsgbg.png"
+    alt="Gender reveal invitation background"
+    className="h-full w-full object-cover"
+  />
+</div>
       <motion.div
         animate={{
           scale: [1, 1.1, 1],

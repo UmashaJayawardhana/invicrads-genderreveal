@@ -14,7 +14,14 @@ export default function Hero({
 }: HeroProps) {
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-[#faf7f3]">
-
+{/* Background Image */}
+<div className="absolute inset-y-0 left-[28%] right-[28%]">
+  <img
+    src="/images/hreobg.png"
+    alt="Gender reveal invitation background"
+    className="h-full w-full object-cover"
+  />
+</div>
       {/* =========================
           BLUE GLOW
       ========================= */}

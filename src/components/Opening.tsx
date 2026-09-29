@@ -14,6 +14,15 @@ export default function Opening({
 }: OpeningProps) {
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-[#faf7f3]">
+   {/* Background Image */}
+<div className="absolute inset-y-0 left-[30%] right-[30%]">
+  <img
+    src="/images/openingbg.png"
+    alt="Gender reveal invitation background"
+    className="h-full w-full object-cover"
+  />
+</div>
+
 
       {/* Blue background */}
       <motion.div
@@ -257,7 +266,7 @@ export default function Opening({
           >
 
             {/* Boy */}
-            <motion.div
+            {/* <motion.div
               whileHover={{
                 y: -5,
               }}
@@ -270,15 +279,15 @@ export default function Opening({
               <p className="mt-2 text-sm font-semibold uppercase tracking-wider text-[#5089ad]">
                 Team Boy
               </p>
-            </motion.div>
+            </motion.div> */}
 
             {/* OR */}
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/80 text-[10px] font-semibold text-[#9a8069] shadow-sm">
+            {/* <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/80 text-[10px] font-semibold text-[#9a8069] shadow-sm">
               OR
-            </div>
+            </div> */}
 
             {/* Girl */}
-            <motion.div
+            {/* <motion.div
               whileHover={{
                 y: -5,
               }}
@@ -286,12 +295,12 @@ export default function Opening({
             >
               <div className="text-4xl">
                 🎀
-              </div>
+              </div> */}
 
-              <p className="mt-2 text-sm font-semibold uppercase tracking-wider text-[#b56f8c]">
+              {/* <p className="mt-2 text-sm font-semibold uppercase tracking-wider text-[#b56f8c]">
                 Team Girl
               </p>
-            </motion.div>
+            </motion.div> */}
 
           </motion.div>
 
