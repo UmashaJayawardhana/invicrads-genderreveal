@@ -15,11 +15,11 @@ export default function Hero({
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-[#faf7f3]">
 {/* Background Image */}
-<div className="absolute inset-y-0 left-[28%] right-[28%]">
+<div className="absolute inset-0 md:left-[28%] md:right-[28%] w-full h-full md:w-auto">
   <img
     src="/images/hreobg.png"
     alt="Gender reveal invitation background"
-    className="h-full w-full object-cover"
+    className="h-full w-full object-cover object-center"
   />
 </div>
       {/* =========================
